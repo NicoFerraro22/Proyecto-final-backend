@@ -1,17 +1,23 @@
 import os
+import pymysql
 from pathlib import Path
 
-import pymysql
 pymysql.install_as_MySQLdb()
+
+# ===========================
+# BASE
+# ===========================
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "dev-secret-change-me")
+SECRET_KEY = os.environ.get("SECRET_KEY", "dev-secret")  
 DEBUG = os.environ.get("DJANGO_DEBUG", "0") == "1"
-ENV = os.environ.get("DJANGO_ENV", "development")
+ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "*").split(",")
 
 
-ALLOWED_HOSTS = ["*"]
+# ===========================
+# APPS
+# ===========================
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -20,16 +26,26 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    
+    # Third party
     "rest_framework",
     "corsheaders",
+
+    # Local apps
     "catalog",
 ]
 
-# MIDDLEWARE — ORDEN CORRECTO SEGÚN LA GUÍA
+
+# ===========================
+# MIDDLEWARE
+# (WhiteNoise debe estar después de SecurityMiddleware)
+# ===========================
+
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
-    "whitenoise.middleware.WhiteNoiseMiddleware",  # 🔥 DEBE ESTAR AQUÍ
+    "whitenoise.middleware.WhiteNoiseMiddleware",   # <--- IMPORTANTE
     "corsheaders.middleware.CorsMiddleware",
+
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -38,27 +54,20 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-ROOT_URLCONF = "bmthshop.urls"
 
-TEMPLATES = [
-    {
-        "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
-        "APP_DIRS": True,
-        "OPTIONS": {
-            "context_processors": [
-                "django.template.context_processors.debug",
-                "django.template.context_processors.request",
-                "django.contrib.auth.context_processors.auth",
-                "django.contrib.messages.context_processors.messages",
-            ],
-        },
-    },
-]
+# ===========================
+# URLS & WSGI
+# ===========================
+
+ROOT_URLCONF = "bmthshop.urls"
 
 WSGI_APPLICATION = "bmthshop.wsgi.application"
 
-# BASE DE DATOS —
+
+# ===========================
+# BASE DE DATOS (Railway MySQL)
+# ===========================
+
 DATABASES = {
     "default": {
         "ENGINE": os.environ.get("DB_ENGINE", "django.db.backends.sqlite3"),
@@ -70,33 +79,10 @@ DATABASES = {
     }
 }
 
-AUTH_PASSWORD_VALIDATORS = []
 
-LANGUAGE_CODE = "es-ar"
-TIME_ZONE = "America/Argentina/Buenos_Aires"
-USE_I18N = True
-USE_TZ = True
-
-# STATIC — REQUERIDO PARA WHITE NOISE
-STATIC_URL = "/static/"
-STATIC_ROOT = BASE_DIR / "staticfiles"  
-
-MEDIA_URL = "/media/"
-MEDIA_ROOT = BASE_DIR / "media"
-
-# STORAGES NUEVO (WhiteNoise 6+)
-STORAGES = {
-    "default": {
-        "BACKEND": "django.core.files.storage.FileSystemStorage",
-    },
-    "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
-    },
-}
-
-DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-
-CORS_ALLOW_ALL_ORIGINS = True
+# ===========================
+# REST FRAMEWORK + JWT
+# ===========================
 
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
@@ -107,9 +93,46 @@ REST_FRAMEWORK = {
     ),
 }
 
-# SEGURIDAD PARA PRODUCCIÓN
-if ENV == "production":
-    SECURE_SSL_REDIRECT = False  # Railway usa proxy reverso
-    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
-    SESSION_COOKIE_SECURE = True
-    CSRF_COOKIE_SECURE = True
+
+# ===========================
+# CORS
+# ===========================
+
+CORS_ALLOW_ALL_ORIGINS = True
+
+
+# ===========================
+# INTERNATIONAL
+# ===========================
+
+LANGUAGE_CODE = "es-ar"
+TIME_ZONE = "America/Argentina/Buenos_Aires"
+USE_I18N = True
+USE_TZ = True
+
+
+# ===========================
+# STATIC & MEDIA (PRODUCCIÓN)
+# ===========================
+
+STATIC_URL = "/static/"
+STATIC_ROOT = BASE_DIR / "staticfiles"
+
+MEDIA_URL = "/media/"
+MEDIA_ROOT = BASE_DIR / "media"
+
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
+
+
+# ===========================
+# AUTO FIELD
+# ===========================
+
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
