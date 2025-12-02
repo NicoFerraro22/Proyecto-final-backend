@@ -12,7 +12,6 @@ router.register(r"products", ProductViewSet, basename="product")
 router.register(r"categories", CategoryViewSet, basename="category")
 
 urlpatterns = [
-    path("api/me/", MeView.as_view(), name="me"),
     path("admin/", admin.site.urls),
     path("api/", include(router.urls)),
     path("api/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
