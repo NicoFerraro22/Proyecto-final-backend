@@ -1,12 +1,15 @@
 import os
 from pathlib import Path
 
+import pymysql
+pymysql.install_as_MySQLdb()
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# VARIABLES DE ENTORNO PARA PRODUCCIÓN
 SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "dev-secret-change-me")
 DEBUG = os.environ.get("DJANGO_DEBUG", "0") == "1"
 ENV = os.environ.get("DJANGO_ENV", "development")
+
 
 ALLOWED_HOSTS = ["*"]
 
@@ -55,7 +58,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "bmthshop.wsgi.application"
 
-# BASE DE DATOS — puede usar SQLite local, MySQL en Railway
+# BASE DE DATOS —
 DATABASES = {
     "default": {
         "ENGINE": os.environ.get("DB_ENGINE", "django.db.backends.sqlite3"),
@@ -76,7 +79,7 @@ USE_TZ = True
 
 # STATIC — REQUERIDO PARA WHITE NOISE
 STATIC_URL = "/static/"
-STATIC_ROOT = BASE_DIR / "staticfiles"  # 🔥 Railway los sirve desde aquí
+STATIC_ROOT = BASE_DIR / "staticfiles"  
 
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
