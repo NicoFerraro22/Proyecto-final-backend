@@ -14,8 +14,7 @@ SECRET_KEY = os.environ.get("SECRET_KEY", "dev-secret")
 DEBUG = os.environ.get("DJANGO_DEBUG", "0") == "1"
 ALLOWED_HOSTS = ["*"]
 CSRF_TRUSTED_ORIGINS = [
-    "https://proyecto-final-backend-production-9af8.up.railway.app",
-]
+    "https://proyecto-final-backend-production-9af8.up.railway.app"],
 
 
 
